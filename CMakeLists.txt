@@ -10,13 +10,16 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 add_executable(bitmex_trade_example 
     bitmex_trade_example.cpp)
 
+find_package(Boost REQUIRED log)
+
 find_package(OpenSSL REQUIRED
     SSL
     Crypto)
 
 find_package(Threads REQUIRED)
     
-target_link_libraries(bitmex_trade_example PUBLIC 
+target_link_libraries(bitmex_trade_example PUBLIC
+    Boost::log
     Threads::Threads
     OpenSSL::SSL
     OpenSSL::Crypto)
