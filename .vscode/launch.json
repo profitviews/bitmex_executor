@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/build/bitmex_trade_example",
             // "args": ["bulk"],
-            "args": ["single"],
+            "args": ["3", "5"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
