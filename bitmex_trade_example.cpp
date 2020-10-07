@@ -3,7 +3,6 @@
 //Boost & Beast headers
 #include <boost/bind.hpp>
 #include <boost/beast/core.hpp>
-#include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/ssl.hpp>
 #include <boost/beast/version.hpp>
@@ -43,7 +42,6 @@ public:
         : total_tests_ {total_tests                         }
         , rest_resolver{net::make_strand(rest_ioc)          }
         , rest_stream  {net::make_strand(rest_ioc), rest_ctx}
-        , order_msg    {                                    }
         , expiry_      {expiry                              }
     { }
     
@@ -59,8 +57,6 @@ private:
     http::request<http::string_body>  post_req;
     http::response<http::string_body> post_res;
     
-    string order_msg;
-    
     // Timing
     struct timespec start, end;
     
@@ -73,7 +69,7 @@ private:
     const char* apiSecCStr = apiSecret.c_str();
     int    expiry_;
     
-    string HMAC_SHA256_hex_POST_single(string valid_till)
+    string HMAC_SHA256_hex_POST_single(string valid_till, const std::string& order_msg)
     {
         string data = "POST/api/v1/order" + valid_till + order_msg;
         
@@ -88,43 +84,49 @@ private:
         
         for (int i = 0; i < len; ++i)
         {
-            ss << std::setw(2) << std::setfill('0') << hex << (unsigned int)out[i];
+            ss << std::setw(2) << std::setfill('0') << hex << static_cast<unsigned int>(out[i]);
         }
         return ss.str();
     }
     
     void REST_on_resolve(beast::error_code ec, tcp::resolver::results_type results)
     {
-        // Make the connection on the IP address we get from a lookup
-        beast::get_lowest_layer(rest_stream).async_connect(
-            results,
-            beast::bind_front_handler(
-                &BitMEX_MM::REST_on_connect,
-                shared_from_this()));
+        beast::get_lowest_layer(rest_stream).async_connect(results, 
+        [&](auto ec, auto endpoint) { REST_on_connect(ec, endpoint); });
     }
 
     void REST_on_connect(beast::error_code ec,
                     tcp::resolver::results_type::endpoint_type)
     {       
-        // Perform the SSL handshake
-        rest_stream.async_handshake(
-            ssl::stream_base::client,
-            beast::bind_front_handler(
-                &BitMEX_MM::REST_market_order_on_handshake,
-                shared_from_this()));
+        rest_stream.async_handshake(ssl::stream_base::client, 
+            [&](auto ec) { REST_market_order_on_handshake(ec); });
     }
     
     void REST_market_order_on_handshake(beast::error_code ec)
     {
+        enum class Side { buy, sell };
+        enum class OrderType { limit, market };
+        const std::map<OrderType, std::string> order_type_names{
+            {OrderType::limit, "Limit"}, {OrderType::market, "Market"}
+        };
+
+        const std::map<Side, std::string> side_names{
+            {Side::buy, "Buy"}, {Side::sell, "Sell"}
+        };
+
+        int orderQty{2};
+        Side side{Side::buy};
+        OrderType type{OrderType::market};
+        std::string symbol{"ETHUSD"};
+
         for (auto i{0}; i<total_tests_; ++i) {
-            order_msg += 
-                "{"
-                    "\"symbol\":\"ETHUSD\","
-                    "\"ordType\":\"Market\","
-                    // "\"clOrdID\":\"" + to_string(i) + "\","
-                    "\"side\":\"Sell\","
-                    "\"orderQty\":2"
-                "}";
+            std::string order_msg =
+            "{"
+                "\"symbol\":\"" + symbol + "\","
+                "\"ordType\":\"" + order_type_names.at(type) + "\","
+                "\"side\":\"" + side_names.at(side) + "\","
+                "\"orderQty\":" + std::to_string(orderQty) +
+            "}";
 
             BOOST_LOG_TRIVIAL(info) << "Send next trade";
 
@@ -132,7 +134,7 @@ private:
             string valid_till_str = to_string(valid_till);
             
             post_req.set("api-expires", valid_till_str);
-            post_req.set("api-signature", HMAC_SHA256_hex_POST_single(valid_till_str));
+            post_req.set("api-signature", HMAC_SHA256_hex_POST_single(valid_till_str, order_msg));
             post_req.set("Content-Length", to_string(order_msg.length()));
             post_req.body() = order_msg;
             
@@ -180,13 +182,9 @@ public:
         post_req.insert("api-signature", "");
         
         // Look up the domain name
-        rest_resolver.async_resolve(
-            "www.bitmex.com",
-            "443",
-            beast::bind_front_handler(
-                &BitMEX_MM::REST_on_resolve,
-                shared_from_this()));
-                
+        rest_resolver.async_resolve("www.bitmex.com", "443",
+            [&](auto ec, auto results) { REST_on_resolve(ec, results); });
+
     }
     
 };

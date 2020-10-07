@@ -8,7 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 # add the executable
 add_executable(bitmex_trade_example 
-    bitmex_trade_example.cpp)
+    execute_bitmex_order.cpp
+    BitmexOrderExecutor.cpp)
 
 find_package(Boost REQUIRED log)
 
