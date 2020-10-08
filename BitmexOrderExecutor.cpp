@@ -45,6 +45,7 @@ BitmexOrderExecutor::BitmexOrderExecutor(int expiry)
     post_req_.insert("Content-Length", "");
     post_req_.insert("api-expires", "");
     post_req_.insert("api-signature", "");
+
 }
 
 void BitmexOrderExecutor::REST_on_resolve(beast::error_code ec, tcp::resolver::results_type results)
@@ -86,7 +87,7 @@ void BitmexOrderExecutor::REST_market_order_on_handshake(beast::error_code ec)
 
 std::string BitmexOrderExecutor::HMAC_SHA256_hex_POST_single(const std::string& valid_till, const std::string& order_message)
 {
-    std::string data = "POST/api/v1/order" + valid_till + order_message_;
+    std::string data = "POST/api/v1/order" + valid_till + order_message;
     
     std::stringstream ss;
     unsigned int len;
@@ -106,17 +107,20 @@ std::string BitmexOrderExecutor::HMAC_SHA256_hex_POST_single(const std::string& 
 
 void BitmexOrderExecutor::order_new(const std::string& symbol, Side side, int orderQty, OrderType type)
 {
-    order_message_ =
+    order_message_ = {
     "{"
         "\"symbol\":\"" + symbol + "\","
         "\"ordType\":\"" + order_type_names_.at(type) + "\","
         "\"side\":\"" + side_names_.at(side) + "\","
         "\"orderQty\":" + std::to_string(orderQty) +
-    "}";
+    "}"};
 
-    // Look up the domain name
     rest_resolver_.async_resolve("www.bitmex.com", "443",
         [&](auto ec, auto results) { REST_on_resolve(ec, results); });
 
     rest_ioc_.run();
+}
+
+BitmexOrderExecutor::~BitmexOrderExecutor()
+{
 }

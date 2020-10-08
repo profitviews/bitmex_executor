@@ -9,6 +9,7 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 # add the executable
 add_executable(bitmex_trade_example 
     execute_bitmex_order.cpp
+    # bitmex_trade_example.cpp
     BitmexOrderExecutor.cpp)
 
 find_package(Boost REQUIRED log)

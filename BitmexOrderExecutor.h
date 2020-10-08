@@ -7,6 +7,7 @@
 #include <boost/asio/ip/tcp.hpp>
 
 #include <map>
+#include <vector>
 
 namespace beast     = boost::beast;         // from <boost/beast.hpp>
 namespace http      = beast::http;          // from <boost/beast/http.hpp>
@@ -30,9 +31,9 @@ private:
 
     http::request<http::string_body>  post_req_;
     http::response<http::string_body> post_res_;
-    
-    std::string order_message_;
 
+    std::string order_message_;
+    
     // Timing
     struct timespec start_, end_;
     
@@ -50,5 +51,7 @@ private:
     std::string HMAC_SHA256_hex_POST_single(const std::string& valid_till, const std::string& order_msg);
 public:
     BitmexOrderExecutor(int);
+    ~BitmexOrderExecutor();
     void order_new(const std::string& symbol, Side side, int orderQty, OrderType type) override;
+
 };

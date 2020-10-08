@@ -115,9 +115,9 @@ private:
         };
 
         int orderQty{2};
-        Side side{Side::buy};
+        Side side{Side::sell};
         OrderType type{OrderType::market};
-        std::string symbol{"ETHUSD"};
+        std::string symbol{"XBTUSD"};
 
         for (auto i{0}; i<total_tests_; ++i) {
             std::string order_msg =
@@ -140,8 +140,14 @@ private:
             
             clock_gettime(CLOCK_MONOTONIC, &start);
             
+            BOOST_LOG_TRIVIAL(info) << "\nAbout to trade...  (press Enter)";
+            std::cin.get();
+
             auto number_of_bytes_written{http::write(rest_stream, post_req)};
             BOOST_LOG_TRIVIAL(info) << "Number of bytes written to stream: " << number_of_bytes_written;
+
+            BOOST_LOG_TRIVIAL(info) << "\nTrade written - about to read response (press Enter)";
+            std::cin.get();
 
             auto number_of_bytes_transferred{http::read(rest_stream, rest_buffer, post_res)};
             BOOST_LOG_TRIVIAL(info) << "Number of bytes transferred from the stream: " << number_of_bytes_transferred;
@@ -150,14 +156,15 @@ private:
             double time_taken;
             time_taken = (end.tv_sec  - start.tv_sec) + ((end.tv_nsec - start.tv_nsec) * 1e-9);
             BOOST_LOG_TRIVIAL(info) << "response time: " << time_taken;
-            
+            BOOST_LOG_TRIVIAL(info) << "\nNext trade...  (press Enter)";
+    		std::cin.get();
         }
     }
     
 public:
         
     void run_REST_service()
-    {           
+    {
         // Set SNI Hostname (many hosts need this to handshake successfully)
         if(! SSL_set_tlsext_host_name(rest_stream.native_handle(), "www.bitmex.com"))
         {

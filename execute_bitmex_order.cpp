@@ -16,21 +16,26 @@ int main(int argc, char** argv)
 
     if(argc < 2) return usage();
     
-    int number_of_tests{0}, time_to_expiry{0};
+    int time_to_expiry{0};
     try {
         time_to_expiry = std::stoi(argv[1]);
     } catch(std::invalid_argument&) {
         return usage();
     }
 
-    auto bitmex{std::make_shared<BitmexOrderExecutor>(5)};
-    
     BOOST_LOG_TRIVIAL(info) << "Running http test.";
 
     using Side = OrderExecutor::Side;
     using OrderType = OrderExecutor::OrderType;
     
-    bitmex->order_new("XBTUSD", Side::buy, 1, OrderType::market);
+    auto bitmex1{std::make_shared<BitmexOrderExecutor>(5)};
+    bitmex1->order_new("XBTUSD", Side::buy, 1, OrderType::market);
+
+    auto bitmex2{std::make_shared<BitmexOrderExecutor>(5)};
+    bitmex2->order_new("ETHUSD", Side::sell, 1, OrderType::market);
     
+    auto bitmex3{std::make_shared<BitmexOrderExecutor>(5)};
+    bitmex3->order_new("XRPUSD", Side::buy, 1, OrderType::market);
+
     return 0;
 }
