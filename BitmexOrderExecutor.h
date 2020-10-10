@@ -37,8 +37,8 @@ private:
     // Timing
     struct timespec start_, end_;
     
-    std::string api_key_    = "P0Og16NeYiyN5zjrbe8C7yik";
-    std::string api_secret_ = "GrFJ9ZAJDVLa7dH41M0_S1c-UE4OSzMaI1H7qqdhOQP3WDUj";
+    std::string api_key_;
+    std::string api_secret_;
     int    api_key_length_ = api_key_.length();
     const char* api_key_c_str_ = api_key_.c_str();
     int    apiSecLen = api_secret_.length();
@@ -50,8 +50,8 @@ private:
     void REST_market_order_on_handshake(beast::error_code ec);
     std::string HMAC_SHA256_hex_POST_single(const std::string& valid_till, const std::string& order_msg);
 public:
-    BitmexOrderExecutor(int);
+    BitmexOrderExecutor(int, const std::string& api_key, const std::string& api_secret);
     ~BitmexOrderExecutor();
-    void order_new(const std::string& symbol, Side side, int orderQty, OrderType type) override;
+    void new_order(const std::string& symbol, Side side, int orderQty, OrderType type) override;
 
 };

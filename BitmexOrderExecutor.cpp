@@ -17,10 +17,12 @@ const std::map<OrderExecutor::Side, std::string> BitmexOrderExecutor::side_names
     {Side::buy, "Buy"}, {Side::sell, "Sell"}
 };
 
-BitmexOrderExecutor::BitmexOrderExecutor(int expiry)
+BitmexOrderExecutor::BitmexOrderExecutor(int expiry, const std::string& api_key, const std::string& api_secret)
 : rest_ctx_     {ssl::context::tlsv12_client           }
 , rest_resolver_{net::make_strand(rest_ioc_)           }
 , rest_stream_  {net::make_strand(rest_ioc_), rest_ctx_}
+, api_key_      {api_key                               }
+, api_secret_   {api_secret                            }
 , expiry_       {expiry                                }
 {
     // Set SNI Hostname (many hosts need this to handshake successfully)
@@ -105,7 +107,7 @@ std::string BitmexOrderExecutor::HMAC_SHA256_hex_POST_single(const std::string& 
     return ss.str();
 }
 
-void BitmexOrderExecutor::order_new(const std::string& symbol, Side side, int orderQty, OrderType type)
+void BitmexOrderExecutor::new_order(const std::string& symbol, Side side, int orderQty, OrderType type)
 {
     order_message_ = {
     "{"

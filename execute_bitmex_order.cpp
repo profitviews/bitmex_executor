@@ -1,4 +1,5 @@
 #include "BitmexOrderExecutor.h"
+#include "Bitmex.h"
 
 #include <boost/log/trivial.hpp>
 
@@ -25,17 +26,11 @@ int main(int argc, char** argv)
 
     BOOST_LOG_TRIVIAL(info) << "Running http test.";
 
-    using Side = OrderExecutor::Side;
-    using OrderType = OrderExecutor::OrderType;
-    
-    auto bitmex1{std::make_shared<BitmexOrderExecutor>(5)};
-    bitmex1->order_new("XBTUSD", Side::buy, 1, OrderType::market);
-
-    auto bitmex2{std::make_shared<BitmexOrderExecutor>(5)};
-    bitmex2->order_new("ETHUSD", Side::sell, 1, OrderType::market);
-    
-    auto bitmex3{std::make_shared<BitmexOrderExecutor>(5)};
-    bitmex3->order_new("XRPUSD", Side::buy, 1, OrderType::market);
+    Bitmex bitmex("P0Og16NeYiyN5zjrbe8C7yik", "GrFJ9ZAJDVLa7dH41M0_S1c-UE4OSzMaI1H7qqdhOQP3WDUj");
+    bitmex.new_order("XBTUSD", Side::sell, 1, OrderType::market);
+    bitmex.new_order("XBTUSD", Side::sell, 1, OrderType::market);
+    bitmex.new_order("ETHUSD", Side::buy, 1, OrderType::market);
+    bitmex.new_order("XRPUSD", Side::sell, 1, OrderType::market);
 
     return 0;
 }
