@@ -11,8 +11,7 @@ public:
     , api_secret_{ api_secret }
     {}
     void new_order(const std::string& symbol, Side side, int orderQty, OrderType type) {
-        std::make_unique<BitmexOrderExecutor> (5, api_key_, api_secret_)->new_order(
-            symbol, side, orderQty, type);
+        BitmexOrderExecutor(5, api_key_, api_secret_).new_order(symbol, side, orderQty, type);
     }
 private:
     std::string api_key_;
