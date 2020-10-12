@@ -50,6 +50,22 @@ BitmexOrderExecutor::BitmexOrderExecutor(int expiry, const std::string& api_key,
 
 }
 
+void BitmexOrderExecutor::new_order(const std::string& symbol, Side side, int orderQty, OrderType type)
+{
+    order_message_ = {
+    "{"
+        "\"symbol\":\"" + symbol + "\","
+        "\"ordType\":\"" + order_type_names_.at(type) + "\","
+        "\"side\":\"" + side_names_.at(side) + "\","
+        "\"orderQty\":" + std::to_string(orderQty) +
+    "}"};
+
+    rest_resolver_.async_resolve("www.bitmex.com", "443",
+        [&](auto ec, auto results) { REST_on_resolve(ec, results); });
+
+    rest_ioc_.run();
+}
+
 void BitmexOrderExecutor::REST_on_resolve(beast::error_code ec, tcp::resolver::results_type results)
 {
     beast::get_lowest_layer(rest_stream_).async_connect(results,  
@@ -105,22 +121,6 @@ std::string BitmexOrderExecutor::HMAC_SHA256_hex_POST(const std::string& valid_t
         ss << std::setw(2) << std::setfill('0') << std::hex << static_cast<unsigned int>(out[i]);
     }
     return ss.str();
-}
-
-void BitmexOrderExecutor::new_order(const std::string& symbol, Side side, int orderQty, OrderType type)
-{
-    order_message_ = {
-    "{"
-        "\"symbol\":\"" + symbol + "\","
-        "\"ordType\":\"" + order_type_names_.at(type) + "\","
-        "\"side\":\"" + side_names_.at(side) + "\","
-        "\"orderQty\":" + std::to_string(orderQty) +
-    "}"};
-
-    rest_resolver_.async_resolve("www.bitmex.com", "443",
-        [&](auto ec, auto results) { REST_on_resolve(ec, results); });
-
-    rest_ioc_.run();
 }
 
 BitmexOrderExecutor::~BitmexOrderExecutor()

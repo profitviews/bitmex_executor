@@ -5,28 +5,21 @@
 
 #include <iostream>
 
-int main(int argc, char** argv)
+auto main(int argc, char** argv) -> int
 {
     auto usage{ [&]()->int {
         std::cout 
             << "Usage: " << argv[0] 
-            << " time_to_expiry"
+            << "API_key API_secret"
             << std::endl;
         return 1;
     }};
 
-    if(argc < 2) return usage();
-    
-    int time_to_expiry{0};
-    try {
-        time_to_expiry = std::stoi(argv[1]);
-    } catch(std::invalid_argument&) {
-        return usage();
-    }
+    if(argc < 3) return usage();
 
-    BOOST_LOG_TRIVIAL(info) << "Running http test.";
+    BOOST_LOG_TRIVIAL(info) << "Running Bitmex test.";
 
-    Bitmex bitmex("P0Og16NeYiyN5zjrbe8C7yik", "GrFJ9ZAJDVLa7dH41M0_S1c-UE4OSzMaI1H7qqdhOQP3WDUj");
+    Bitmex bitmex(argv[1], argv[2]);
     bitmex.new_order("XBTUSD", Side::sell, 1, OrderType::market);
     bitmex.new_order("XBTUSD", Side::sell, 1, OrderType::market);
     bitmex.new_order("ETHUSD", Side::buy, 1, OrderType::market);
