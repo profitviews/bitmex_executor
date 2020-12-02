@@ -21,9 +21,9 @@ auto main(int argc, char** argv) -> int
 
     Bitmex bitmex(argv[1], argv[2]);
     bitmex.new_order("XBTUSD", Side::sell, 1, OrderType::market);
-    bitmex.new_order("XBTUSD", Side::sell, 1, OrderType::market);
-    bitmex.new_order("ETHUSD", Side::buy, 1, OrderType::market);
-    bitmex.new_order("XRPUSD", Side::sell, 1, OrderType::market);
+    // bitmex.new_order("XBTUSD", Side::sell, 1, OrderType::market);
+    // bitmex.new_order("ETHUSD", Side::buy, 1, OrderType::market);
+    // bitmex.new_order("XRPUSD", Side::sell, 1, OrderType::market);
 
     return 0;
 }
