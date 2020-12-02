@@ -48,7 +48,7 @@ private:
     void REST_on_resolve(beast::error_code ec, tcp::resolver::results_type results);
     void REST_on_connect(beast::error_code ec, tcp::resolver::results_type::endpoint_type);
     void REST_market_order_on_handshake(beast::error_code ec);
-    std::string HMAC_SHA256_hex_POST(const std::string& valid_till, const std::string& order_msg);
+    std::string HMAC_SHA256_hex(const std::string& valid_till, const std::string& order_msg);
 public:
     BitmexOrderExecutor(int, const std::string& api_key, const std::string& api_secret);
     ~BitmexOrderExecutor();

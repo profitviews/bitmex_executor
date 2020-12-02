@@ -47,7 +47,6 @@ BitmexOrderExecutor::BitmexOrderExecutor(int expiry, const std::string& api_key,
     post_req_.insert("Content-Length", "");
     post_req_.insert("api-expires", "");
     post_req_.insert("api-signature", "");
-
 }
 
 void BitmexOrderExecutor::new_order(const std::string& symbol, Side side, int orderQty, OrderType type)
@@ -85,7 +84,7 @@ void BitmexOrderExecutor::REST_market_order_on_handshake(beast::error_code ec)
     std::string valid_till_str = std::to_string(valid_till);
     
     post_req_.set("api-expires", valid_till_str);
-    post_req_.set("api-signature", HMAC_SHA256_hex_POST(valid_till_str, order_message_));
+    post_req_.set("api-signature", HMAC_SHA256_hex(valid_till_str, order_message_));
     post_req_.set("Content-Length", std::to_string(order_message_.length()));
     post_req_.body() = order_message_;
     
@@ -103,10 +102,10 @@ void BitmexOrderExecutor::REST_market_order_on_handshake(beast::error_code ec)
     BOOST_LOG_TRIVIAL(info) << "response time: " << time_taken;
 }
 
-std::string BitmexOrderExecutor::HMAC_SHA256_hex_POST(const std::string& valid_till, const std::string& order_message)
+std::string BitmexOrderExecutor::HMAC_SHA256_hex(const std::string& valid_till, const std::string& order_message)
 {
-    std::string data = "POST/api/v1/order" + valid_till + order_message;
-    
+    std::string data = post_req_.method_string().to_string() + post_req_.target().to_string() + valid_till + order_message;
+
     std::stringstream ss;
     unsigned int len;
     unsigned char out[EVP_MAX_MD_SIZE];
