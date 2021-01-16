@@ -130,11 +130,11 @@ private:
 
             BOOST_LOG_TRIVIAL(info) << "Send next trade";
 
-            int valid_till        = time(0) + expiry_;
-            string valid_till_str = to_string(valid_till);
+            int valid_til        = time(0) + expiry_;
+            string valid_til_str = to_string(valid_til);
             
-            post_req.set("api-expires", valid_till_str);
-            post_req.set("api-signature", HMAC_SHA256_hex_POST_single(valid_till_str, order_msg));
+            post_req.set("api-expires", valid_til_str);
+            post_req.set("api-signature", HMAC_SHA256_hex_POST_single(valid_til_str, order_msg));
             post_req.set("Content-Length", to_string(order_msg.length()));
             post_req.body() = order_msg;
             

@@ -3,7 +3,10 @@ cmake_minimum_required(VERSION 3.10)
 # set the project name
 project(bitmex_trade_example VERSION 1.0)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_COMPILER "/usr/bin/gcc-10")
+set(CMAKE_CXX_COMPILER "/bin/g++-10")
+
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
@@ -20,7 +23,6 @@ target_link_libraries(bitmex_trade
 
 # add the executable
 add_executable(bitmex_trade_example 
-    # bitmex_trade_example.cpp
     execute_bitmex_order.cpp)
 
 find_package(Boost REQUIRED log)

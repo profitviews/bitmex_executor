@@ -1,9 +1,8 @@
 #pragma once
 
 #include "Exchange.h"
-#include "BitmexOrderExecutor.h"
 
-class Bitmex : Exchange
+class Bitmex : public Exchange
 {
 public:
     Bitmex(const std::string& api_key, const std::string& api_secret)
@@ -15,5 +14,4 @@ public:
 private:
     std::string api_key_;
     std::string api_secret_;
-
 };

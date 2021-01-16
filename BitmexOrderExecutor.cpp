@@ -9,6 +9,41 @@
 #include <iostream>
 #include <iomanip>
 
+class BitMEX_HMAC
+{
+public:
+    BitMEX_HMAC(const std::string& api_secret, const EVP_MD* evp)
+    : ctx_{HMAC_CTX_new()}
+    {
+        HMAC_Init_ex(ctx_, api_secret.c_str(), api_secret.length(), evp, nullptr);
+    }
+
+    void Update(const std::string& data)
+    {
+        HMAC_Update(ctx_, reinterpret_cast<const unsigned char *>(data.c_str()), data.length());
+    }
+
+    const std::string get_hex() 
+    {
+        unsigned char out[EVP_MAX_MD_SIZE];
+        unsigned int len;
+        HMAC_Final(ctx_, out, &len);
+
+        std::stringstream ss;
+        for (int i = 0; i < len; ++i)
+            ss << std::setw(2) << std::setfill('0') << std::hex << static_cast<unsigned int>(out[i]);
+        return ss.str();
+    }
+
+    ~BitMEX_HMAC()
+    {
+        HMAC_CTX_free(ctx_);
+    }
+
+private:
+    HMAC_CTX* ctx_;
+};
+
 const std::map<OrderExecutor::OrderType, std::string> BitmexOrderExecutor::order_type_names_{
     {OrderType::limit, "Limit"}, {OrderType::market, "Market"}
 };
@@ -82,9 +117,12 @@ void BitmexOrderExecutor::REST_market_order_on_handshake(beast::error_code ec)
 {
     int valid_till        = time(0) + expiry_;
     std::string valid_till_str = std::to_string(valid_till);
-    
     post_req_.set("api-expires", valid_till_str);
-    post_req_.set("api-signature", HMAC_SHA256_hex(valid_till_str, order_message_));
+
+    BitMEX_HMAC hmac{api_secret_, EVP_sha256()};
+    hmac.Update(post_req_.method_string().to_string() + post_req_.target().to_string() + valid_till_str + order_message_);
+    post_req_.set("api-signature", hmac.get_hex());
+
     post_req_.set("Content-Length", std::to_string(order_message_.length()));
     post_req_.body() = order_message_;
     
@@ -100,52 +138,6 @@ void BitmexOrderExecutor::REST_market_order_on_handshake(beast::error_code ec)
     double time_taken;
     time_taken = (end_.tv_sec  - start_.tv_sec) + ((end_.tv_nsec - start_.tv_nsec) * 1e-9);
     BOOST_LOG_TRIVIAL(info) << "response time: " << time_taken;
-}
-
-namespace bitmex_order_executor {
-class HMAC
-{
-public:
-    HMAC(const std::string& api_secret, const EVP_MD* evp)
-    : ctx_{HMAC_CTX_new()}
-    {
-        HMAC_Init_ex(ctx_, api_secret.c_str(), api_secret.length(), evp, nullptr);
-    }
-
-    void Update(const std::string& data)
-    {
-        HMAC_Update(ctx_, reinterpret_cast<const unsigned char *>(data.c_str()), data.length());
-    }
-
-    const std::string get_hex() 
-    {
-        unsigned char out[EVP_MAX_MD_SIZE];
-        unsigned int len;
-        HMAC_Final(ctx_, out, &len);
-
-        std::stringstream ss;
-        for (int i = 0; i < len; ++i)
-            ss << std::setw(2) << std::setfill('0') << std::hex << static_cast<unsigned int>(out[i]);
-        return ss.str();
-    }
-
-    ~HMAC()
-    {
-        HMAC_CTX_free(ctx_);
-    }
-
-private:
-    HMAC_CTX* ctx_;
-};
-}
-
-std::string BitmexOrderExecutor::HMAC_SHA256_hex(const std::string& valid_till, const std::string& order_message)
-{
-    std::string data = post_req_.method_string().to_string() + post_req_.target().to_string() + valid_till + order_message;
-
-    bitmex_order_executor::HMAC hmac{api_secret_, EVP_sha256()};
-    hmac.Update(data);
-    return hmac.get_hex();
 }
 
 BitmexOrderExecutor::~BitmexOrderExecutor()
