@@ -1,10 +1,15 @@
 cmake_minimum_required(VERSION 3.10)
 
 # set the project name
-project(bitmex_trade_example VERSION 1.0)
+project(bitmex_executor VERSION 1.0)
 
+if(CMAKE_SYSTEM_NAME EQUAL "MSYS")
+set(CMAKE_C_COMPILER "/mingw64/bin/gcc")
+set(CMAKE_CXX_COMPILER "/mingw64/bin/g++")
+elseif(CMAKE_SYSTEM_NAME EQUAL Linux)
 set(CMAKE_C_COMPILER "/usr/bin/gcc-10")
 set(CMAKE_CXX_COMPILER "/bin/g++-10")
+endif()
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -22,7 +27,7 @@ target_link_libraries(bitmex_trade
 )
 
 # add the executable
-add_executable(bitmex_trade_example 
+add_executable(bitmex_executor 
     execute_bitmex_order.cpp)
 
 find_package(Boost REQUIRED log)
@@ -33,7 +38,7 @@ find_package(OpenSSL REQUIRED
 
 find_package(Threads REQUIRED)
     
-target_link_libraries(bitmex_trade_example PUBLIC
+target_link_libraries(bitmex_executor PUBLIC
     Boost::log
     Threads::Threads
     OpenSSL::SSL
@@ -41,5 +46,5 @@ target_link_libraries(bitmex_trade_example PUBLIC
     bitmex_trade
 )
 
-target_include_directories(bitmex_trade_example PUBLIC 
+target_include_directories(bitmex_executor PUBLIC 
     "${PROJECT_BINARY_DIR}")
