@@ -10,3 +10,14 @@
    `cmake`
    `mingw-w64-x86_64-boost`
    `mingw-w64-x86_64-poco`
+   
+3. Download the latest TA-Lib **source** tar ball from [ta-lib.org](https://www.ta-lib.org/hdr_dw.html) - currently that is `ta-lib-0.4.0-src.tar.gz`
+   In some appropriate directory do
+   ```bash
+   ta-lib-0.4.0-src.tar.gz 
+   cd ta-lib/
+   ./configure
+   make
+   make install
+   
+   
