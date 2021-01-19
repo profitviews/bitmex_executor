@@ -10,7 +10,7 @@ auto main(int argc, char** argv) -> int
     auto usage{ [&]()->int {
         std::cout 
             << "Usage: " << argv[0] 
-            << "API_key API_secret"
+            << " API_key API_secret"
             << std::endl;
         return 1;
     }};
