@@ -21,6 +21,8 @@ class BitmexOrderExecutor : public OrderExecutor
 private:
     static const std::map<OrderType, std::string> order_type_names_;
     static const std::map<Side, std::string> side_names_;
+    const std::string BitMEX_address{"www.bitmex.com"};
+    const std::string SSL_port{"443"};
 
     net::io_context rest_ioc_;
     ssl::context    rest_ctx_;
@@ -29,7 +31,7 @@ private:
     beast::ssl_stream<beast::tcp_stream> rest_stream_;
     beast::flat_buffer rest_buffer_;
 
-    http::request<http::string_body>  post_req_;
+    http::request<http::string_body>  post_request_;
     http::response<http::string_body> post_res_;
 
     std::string order_message_;
@@ -39,11 +41,7 @@ private:
     
     std::string api_key_;
     std::string api_secret_;
-    int    api_key_length_ = api_key_.length();
-    const char* api_key_c_str_ = api_key_.c_str();
-    int    apiSecLen = api_secret_.length();
-    const char* api_secret_c_str_ = api_secret_.c_str();
-    int    expiry_;
+    int expiry_;
 
     void REST_on_resolve(beast::error_code ec, tcp::resolver::results_type results);
     void REST_on_connect(beast::error_code ec, tcp::resolver::results_type::endpoint_type);

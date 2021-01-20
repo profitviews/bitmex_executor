@@ -61,40 +61,39 @@ BitmexOrderExecutor::BitmexOrderExecutor(int expiry, const std::string& api_key,
 , expiry_       {expiry                                }
 {
     // Set SNI Hostname (many hosts need this to handshake successfully)
-    if(! SSL_set_tlsext_host_name(rest_stream_.native_handle(), "www.bitmex.com"))
+    if(! SSL_set_tlsext_host_name(rest_stream_.native_handle(), BitMEX_address.c_str()))
     {
         beast::error_code ec{static_cast<int>(::ERR_get_error()), net::error::get_ssl_category()};
-        std::cerr << "ssl err " << ec.message() << "\n";
+        std::cerr << "SSL error: " << ec.message() << "\n";
         return;
     }
     
-    // Set up an HTTP GET request message
-    post_req_.version(11);
-    post_req_.method(http::verb::post);
-    std::string target{"/api/v1/order"};
-    post_req_.target(target);
-    post_req_.set(http::field::host, "www.bitmex.com");
-    post_req_.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-    post_req_.set(http::field::accept, "*/*");
-    post_req_.set(http::field::content_type, "application/json");
-    post_req_.set(http::field::connection, "Keep-Alive");
-    post_req_.set("api-key", api_key_c_str_);
-    post_req_.insert("Content-Length", "");
-    post_req_.insert("api-expires", "");
-    post_req_.insert("api-signature", "");
+    // Set up an HTTP POST request message
+    post_request_.version(11); // HTTP Version 1.1
+    post_request_.method(http::verb::post);
+    post_request_.target("/api/v1/order");
+    post_request_.set(http::field::host, BitMEX_address);
+    post_request_.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+    post_request_.set(http::field::accept, "*/*");
+    post_request_.set(http::field::content_type, "application/json");
+    post_request_.set(http::field::connection, "Keep-Alive");
+    post_request_.set("api-key", api_key_.c_str());
+    post_request_.insert("Content-Length", "");
+    post_request_.insert("api-expires", "");
+    post_request_.insert("api-signature", "");
 }
 
 void BitmexOrderExecutor::new_order(const std::string& symbol, Side side, int orderQty, OrderType type)
 {
     order_message_ = {
     "{"
-        "\"symbol\":\"" + symbol + "\","
+        "\"symbol\":\""  + symbol                     + "\","
         "\"ordType\":\"" + order_type_names_.at(type) + "\","
-        "\"side\":\"" + side_names_.at(side) + "\","
-        "\"orderQty\":" + std::to_string(orderQty) +
+        "\"side\":\""    + side_names_.at(side)       + "\","
+        "\"orderQty\":"  + std::to_string(orderQty)   +
     "}"};
 
-    rest_resolver_.async_resolve("www.bitmex.com", "443",
+    rest_resolver_.async_resolve(BitMEX_address, SSL_port,
         [&](auto ec, auto results) { REST_on_resolve(ec, results); });
 
     rest_ioc_.run();
@@ -115,20 +114,19 @@ void BitmexOrderExecutor::REST_on_connect(beast::error_code ec,
 
 void BitmexOrderExecutor::REST_market_order_on_handshake(beast::error_code ec)
 {
-    int valid_till        = time(0) + expiry_;
-    std::string valid_till_str = std::to_string(valid_till);
-    post_req_.set("api-expires", valid_till_str);
+    std::string valid_til{std::to_string(time(0) + expiry_)};
+    post_request_.set("api-expires", valid_til);
 
     BitMEX_HMAC hmac{api_secret_, EVP_sha256()};
-    hmac.Update(post_req_.method_string().to_string() + post_req_.target().to_string() + valid_till_str + order_message_);
-    post_req_.set("api-signature", hmac.get_hex());
+    hmac.Update(post_request_.method_string().to_string() + post_request_.target().to_string() + valid_til + order_message_);
+    post_request_.set("api-signature", hmac.get_hex());
 
-    post_req_.set("Content-Length", std::to_string(order_message_.length()));
-    post_req_.body() = order_message_;
+    post_request_.set("Content-Length", std::to_string(order_message_.length()));
+    post_request_.body() = order_message_;
     
     clock_gettime(CLOCK_MONOTONIC, &start_);
     
-    auto number_of_bytes_written{http::write(rest_stream_, post_req_)};
+    auto number_of_bytes_written{http::write(rest_stream_, post_request_)};
     BOOST_LOG_TRIVIAL(info) << "Number of bytes written to stream: " << number_of_bytes_written;
 
     auto number_of_bytes_transferred{http::read(rest_stream_, rest_buffer_, post_res_)};
