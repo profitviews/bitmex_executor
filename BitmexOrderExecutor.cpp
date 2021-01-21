@@ -53,12 +53,12 @@ const std::map<OrderExecutor::Side, std::string> BitmexOrderExecutor::side_names
 };
 
 BitmexOrderExecutor::BitmexOrderExecutor(int expiry, const std::string& api_key, const std::string& api_secret)
-: rest_ctx_     {ssl::context::tlsv12_client           }
-, rest_resolver_{net::make_strand(rest_io_context_)           }
-, rest_stream_  {net::make_strand(rest_io_context_), rest_ctx_}
-, api_key_      {api_key                               }
-, api_secret_   {api_secret                            }
-, expiry_       {expiry                                }
+: rest_context_ {ssl::context::tlsv12_client                      }
+, rest_resolver_{net::make_strand(rest_io_context_)               }
+, rest_stream_  {net::make_strand(rest_io_context_), rest_context_}
+, api_key_      {api_key                                          }
+, api_secret_   {api_secret                                       }
+, expiry_       {expiry                                           }
 {
     // Set SNI Hostname (many hosts need this to handshake successfully)
     if(! SSL_set_tlsext_host_name(rest_stream_.native_handle(), BitMEX_address.c_str()))
@@ -104,6 +104,13 @@ std::string BitmexOrderExecutor::result() const
     return result_body_;
 }
 
+BitmexOrderExecutor::~BitmexOrderExecutor()
+{
+}
+
+
+// Private methods
+
 void BitmexOrderExecutor::REST_on_resolve(beast::error_code ec, tcp::resolver::results_type results)
 {
     beast::get_lowest_layer(rest_stream_).async_connect(results,  
@@ -145,8 +152,4 @@ void BitmexOrderExecutor::REST_market_order_on_handshake(beast::error_code ec)
     BOOST_LOG_TRIVIAL(info) 
         << "Response time: " 
         << (end_.tv_sec  - start_.tv_sec) + ((end_.tv_nsec - start_.tv_nsec) * 1e-9);
-}
-
-BitmexOrderExecutor::~BitmexOrderExecutor()
-{
 }

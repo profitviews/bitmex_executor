@@ -7,15 +7,14 @@
 
 auto main(int argc, char** argv) -> int
 {
-    auto usage{ [&]()->int {
+    if(argc < 3) 
+    {
         std::cout 
             << "Usage: " << argv[0] 
             << " API_key API_secret"
             << std::endl;
         return 1;
-    }};
-
-    if(argc < 3) return usage();
+    }
 
     BOOST_LOG_TRIVIAL(info) << "Running Bitmex test.";
 

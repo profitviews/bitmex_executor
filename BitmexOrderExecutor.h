@@ -25,7 +25,7 @@ private:
     const std::string SSL_port{"443"};
 
     net::io_context rest_io_context_;
-    ssl::context    rest_ctx_;
+    ssl::context    rest_context_;
     
     tcp::resolver rest_resolver_;
     beast::ssl_stream<beast::tcp_stream> rest_stream_;
