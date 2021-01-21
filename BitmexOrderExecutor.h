@@ -24,7 +24,7 @@ private:
     const std::string BitMEX_address{"www.bitmex.com"};
     const std::string SSL_port{"443"};
 
-    net::io_context rest_ioc_;
+    net::io_context rest_io_context_;
     ssl::context    rest_ctx_;
     
     tcp::resolver rest_resolver_;
@@ -32,9 +32,10 @@ private:
     beast::flat_buffer rest_buffer_;
 
     http::request<http::string_body>  post_request_;
-    http::response<http::string_body> post_res_;
+    http::response<http::string_body> post_results_;
 
     std::string order_message_;
+    std::string result_body_;
     
     // Timing
     struct timespec start_, end_;
@@ -51,5 +52,5 @@ public:
     BitmexOrderExecutor(int, const std::string& api_key, const std::string& api_secret);
     ~BitmexOrderExecutor();
     void new_order(const std::string& symbol, Side side, int orderQty, OrderType type) override;
-
+    std::string result() const override;
 };

@@ -69,9 +69,9 @@ private:
     const char* apiSecCStr = apiSecret.c_str();
     int    expiry_;
     
-    string HMAC_SHA256_hex_POST_single(string valid_till, const std::string& order_msg)
+    string HMAC_SHA256_hex_POST_single(string valid_til, const std::string& order_msg)
     {
-        string data = "POST/api/v1/order" + valid_till + order_msg;
+        string data = "POST/api/v1/order" + valid_til + order_msg;
         
         stringstream ss;
         unsigned int len;

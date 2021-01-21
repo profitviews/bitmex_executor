@@ -54,8 +54,8 @@ const std::map<OrderExecutor::Side, std::string> BitmexOrderExecutor::side_names
 
 BitmexOrderExecutor::BitmexOrderExecutor(int expiry, const std::string& api_key, const std::string& api_secret)
 : rest_ctx_     {ssl::context::tlsv12_client           }
-, rest_resolver_{net::make_strand(rest_ioc_)           }
-, rest_stream_  {net::make_strand(rest_ioc_), rest_ctx_}
+, rest_resolver_{net::make_strand(rest_io_context_)           }
+, rest_stream_  {net::make_strand(rest_io_context_), rest_ctx_}
 , api_key_      {api_key                               }
 , api_secret_   {api_secret                            }
 , expiry_       {expiry                                }
@@ -96,7 +96,12 @@ void BitmexOrderExecutor::new_order(const std::string& symbol, Side side, int or
     rest_resolver_.async_resolve(BitMEX_address, SSL_port,
         [&](auto ec, auto results) { REST_on_resolve(ec, results); });
 
-    rest_ioc_.run();
+    rest_io_context_.run();
+}
+
+std::string BitmexOrderExecutor::result() const
+{
+    return result_body_;
 }
 
 void BitmexOrderExecutor::REST_on_resolve(beast::error_code ec, tcp::resolver::results_type results)
@@ -105,11 +110,9 @@ void BitmexOrderExecutor::REST_on_resolve(beast::error_code ec, tcp::resolver::r
         [&](auto ec, auto endpoint) { REST_on_connect(ec, endpoint); });
 }
 
-void BitmexOrderExecutor::REST_on_connect(beast::error_code ec,
-                tcp::resolver::results_type::endpoint_type)
+void BitmexOrderExecutor::REST_on_connect(beast::error_code ec, tcp::resolver::results_type::endpoint_type)
 {       
-    rest_stream_.async_handshake(ssl::stream_base::client, 
-        [&](auto ec) { REST_market_order_on_handshake(ec); });
+    rest_stream_.async_handshake(ssl::stream_base::client, [&](auto ec) { REST_market_order_on_handshake(ec); });
 }
 
 void BitmexOrderExecutor::REST_market_order_on_handshake(beast::error_code ec)
@@ -118,24 +121,30 @@ void BitmexOrderExecutor::REST_market_order_on_handshake(beast::error_code ec)
     post_request_.set("api-expires", valid_til);
 
     BitMEX_HMAC hmac{api_secret_, EVP_sha256()};
-    hmac.Update(post_request_.method_string().to_string() + post_request_.target().to_string() + valid_til + order_message_);
+    hmac.Update(
+        post_request_.method_string().to_string() + 
+        post_request_.target().to_string()        + 
+        valid_til                                 + 
+        order_message_);
     post_request_.set("api-signature", hmac.get_hex());
-
     post_request_.set("Content-Length", std::to_string(order_message_.length()));
     post_request_.body() = order_message_;
     
     clock_gettime(CLOCK_MONOTONIC, &start_);
     
-    auto number_of_bytes_written{http::write(rest_stream_, post_request_)};
-    BOOST_LOG_TRIVIAL(info) << "Number of bytes written to stream: " << number_of_bytes_written;
-
-    auto number_of_bytes_transferred{http::read(rest_stream_, rest_buffer_, post_res_)};
-    BOOST_LOG_TRIVIAL(info) << "Number of bytes transferred from the stream: " << number_of_bytes_transferred;
+    BOOST_LOG_TRIVIAL(info) 
+        << "Number of bytes written to stream: " 
+        << http::write(rest_stream_, post_request_);
+    BOOST_LOG_TRIVIAL(info) 
+        << "Number of bytes transferred from the stream: " 
+        << http::read(rest_stream_, rest_buffer_, post_results_);
+    
+    result_body_ = post_results_.body();
 
     clock_gettime(CLOCK_MONOTONIC, &end_);
-    double time_taken;
-    time_taken = (end_.tv_sec  - start_.tv_sec) + ((end_.tv_nsec - start_.tv_nsec) * 1e-9);
-    BOOST_LOG_TRIVIAL(info) << "response time: " << time_taken;
+    BOOST_LOG_TRIVIAL(info) 
+        << "Response time: " 
+        << (end_.tv_sec  - start_.tv_sec) + ((end_.tv_nsec - start_.tv_nsec) * 1e-9);
 }
 
 BitmexOrderExecutor::~BitmexOrderExecutor()

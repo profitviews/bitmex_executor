@@ -29,7 +29,6 @@ add_library(bitmex_trade STATIC
 
 if(CMAKE_SYSTEM_NAME MATCHES "^MINGW64")
   target_link_libraries(bitmex_trade 
-	  wsock32
 	  ws2_32)
 endif()
 
@@ -54,7 +53,6 @@ find_package(Threads REQUIRED)
     
 if(CMAKE_SYSTEM_NAME MATCHES "^MINGW64")
     target_link_libraries(bitmex_executor PUBLIC 
-	    wsock32
 	    ws2_32)
 endif()
 

@@ -9,7 +9,7 @@ public:
     : api_key_   { api_key    }
     , api_secret_{ api_secret }
     {}
-    void new_order(const std::string& symbol, Side side, int orderQty, OrderType type) override;
+    std::string new_order(const std::string& symbol, Side side, int orderQty, OrderType type) override;
 
 private:
     std::string api_key_;
