@@ -1,7 +1,7 @@
-#include "BitmexOrderExecutor.h"
 #include "Bitmex.h"
 
 #include <boost/log/trivial.hpp>
+#include <boost/json.hpp>
 
 #include <iostream>
 
@@ -19,6 +19,7 @@ auto main(int argc, char** argv) -> int
     BOOST_LOG_TRIVIAL(info) << "Running Bitmex test.";
 
     Bitmex bitmex(argv[1], argv[2]);
+
     BOOST_LOG_TRIVIAL(info) << "XBTUSD 1 result: " << bitmex.new_order("XBTUSD", Side::sell, 1, OrderType::market) << std::endl;
     BOOST_LOG_TRIVIAL(info) << "XBTUSD 2 result: " << bitmex.new_order("XBTUSD", Side::sell, 1, OrderType::market) << std::endl;
     BOOST_LOG_TRIVIAL(info) << "ETHUSD result: " << bitmex.new_order("ETHUSD", Side::buy,  1, OrderType::market) << std::endl;

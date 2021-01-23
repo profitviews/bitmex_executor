@@ -4,9 +4,11 @@
 #include <boost/beast/version.hpp>
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/asio/strand.hpp>
+#include <boost/json.hpp>
 #include <openssl/hmac.h>
 
 #include <iostream>
+#include <unordered_map>
 #include <iomanip>
 
 class BitMEX_HMAC
@@ -99,9 +101,18 @@ void BitmexOrderExecutor::new_order(const std::string& symbol, Side side, int or
     rest_io_context_.run();
 }
 
-std::string BitmexOrderExecutor::result() const
+boost::json::object BitmexOrderExecutor::result() const
 {
-    return result_body_;
+    using namespace boost::json;
+
+    object headers, body;
+    for(auto& header : post_results_)
+        headers.emplace(header.name_string(), header.value());
+
+    parser p;
+    p.write(post_results_.body());
+
+    return {{"headers", headers }, {"body", p.release() }};
 }
 
 BitmexOrderExecutor::~BitmexOrderExecutor()
@@ -146,8 +157,6 @@ void BitmexOrderExecutor::REST_market_order_on_handshake(beast::error_code ec)
         << "Number of bytes transferred from the stream: " 
         << http::read(rest_stream_, rest_buffer_, post_results_);
     
-    result_body_ = post_results_.body();
-
     clock_gettime(CLOCK_MONOTONIC, &end_);
     BOOST_LOG_TRIVIAL(info) 
         << "Response time: " 

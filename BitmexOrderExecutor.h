@@ -1,10 +1,12 @@
-#pragma once
+#if !defined(BitmexOrderExecutor_h)
+#define BitmexOrderExecutor_h
 
 #include "OrderExecutor.h"
 #include <boost/beast/http.hpp>
 #include <boost/beast/ssl.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/json.hpp>
 
 #include <map>
 #include <vector>
@@ -35,7 +37,6 @@ private:
     http::response<http::string_body> post_results_;
 
     std::string order_message_;
-    std::string result_body_;
     
     // Timing
     struct timespec start_, end_;
@@ -52,5 +53,7 @@ public:
     BitmexOrderExecutor(int, const std::string& api_key, const std::string& api_secret);
     ~BitmexOrderExecutor();
     void new_order(const std::string& symbol, Side side, int orderQty, OrderType type) override;
-    std::string result() const override;
+    boost::json::object result() const;
 };
+
+#endif

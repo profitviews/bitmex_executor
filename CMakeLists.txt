@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.10)
 project(bitmex_executor VERSION 1.0)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
+set(Boost_DEBUG ON)
 
 message("-------------- Checking names -------------")
 message("CMAKE_SYSTEM_NAME")
@@ -19,6 +20,8 @@ set(CMAKE_C_COMPILER "/usr/bin/gcc-10")
 set(CMAKE_CXX_COMPILER "/bin/g++-10")
 endif()
 
+add_compile_options(-v -Wl,--verbose)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -33,16 +36,15 @@ if(CMAKE_SYSTEM_NAME MATCHES "^MINGW64")
 endif()
 
 target_link_libraries(bitmex_trade 
+    Boost::json
     Boost::log
     Threads::Threads
     OpenSSL::SSL
     OpenSSL::Crypto
 )
 
-# add the executable
-add_executable(bitmex_executor 
-    execute_bitmex_order.cpp)
-
+set(BOOST_ROOT "/usr/local/")
+find_package(Boost REQUIRED json)
 find_package(Boost REQUIRED log)
 
 find_package(OpenSSL REQUIRED
@@ -50,19 +52,11 @@ find_package(OpenSSL REQUIRED
     Crypto)
 
 find_package(Threads REQUIRED)
-    
-if(CMAKE_SYSTEM_NAME MATCHES "^MINGW64")
-    target_link_libraries(bitmex_executor PUBLIC 
-	    ws2_32)
-endif()
+
+# add the executable
+add_executable(bitmex_executor 
+    execute_bitmex_order.cpp)
 
 target_link_libraries(bitmex_executor PUBLIC
-    Boost::log
-    Threads::Threads
-    OpenSSL::SSL
-    OpenSSL::Crypto
     bitmex_trade
 )
-
-target_include_directories(bitmex_executor PUBLIC 
-    "${PROJECT_BINARY_DIR}")
