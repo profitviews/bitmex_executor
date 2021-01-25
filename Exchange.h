@@ -1,6 +1,4 @@
-#if !defined(Exchange_h)
-#define Exchange_h
-
+#pragma once
 #include "OrderExecutor.h"
 
 #include <boost/json.hpp>
@@ -15,5 +13,3 @@ public:
 
     virtual ~Exchange(){};
 };
-
-#endif

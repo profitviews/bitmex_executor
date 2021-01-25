@@ -1,5 +1,4 @@
-#if !defined(BitmexOrderExecutor_h)
-#define BitmexOrderExecutor_h
+#pragma once
 
 #include "OrderExecutor.h"
 #include <boost/beast/http.hpp>
@@ -55,5 +54,3 @@ public:
     void new_order(const std::string& symbol, Side side, int orderQty, OrderType type) override;
     boost::json::object result() const;
 };
-
-#endif

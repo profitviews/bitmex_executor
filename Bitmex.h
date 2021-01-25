@@ -1,5 +1,4 @@
-#if !defined(Bitmex_h)
-#define Bitmex_h
+#pragma once
 
 #include <boost/json.hpp>
 #include "Exchange.h"
@@ -17,5 +16,3 @@ private:
     std::string api_key_;
     std::string api_secret_;
 };
-
-#endif
