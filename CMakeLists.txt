@@ -17,7 +17,7 @@ set(CMAKE_C_COMPILER "/mingw64/bin/gcc")
 set(CMAKE_CXX_COMPILER "/mingw64/bin/g++")
 elseif(CMAKE_SYSTEM_NAME EQUAL Linux)
 set(CMAKE_C_COMPILER "/usr/bin/gcc-10")
-set(CMAKE_CXX_COMPILER "/bin/g++-10")
+set(CMAKE_CXX_COMPILER "/usr/bin/g++-10")
 endif()
 
 add_compile_options(-v -Wl,--verbose)
