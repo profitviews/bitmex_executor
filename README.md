@@ -20,9 +20,10 @@ To build `bitmex_executor` you must install the following packages:
 
 2. Msys will give you `pacman` package manager, `g++` and other essential programs.
    Use `pacman` to get:
-   `cmake`
-   `mingw-w64-x86_64-boost`
-   `mingw-w64-x86_64-poco`
+   
+   * `cmake`
+   * `mingw-w64-x86_64-boost`
+   * `mingw-w64-x86_64-poco`
    
 ## Linux
 
