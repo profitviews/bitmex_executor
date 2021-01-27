@@ -25,6 +25,7 @@ cd boost_1_75_0
 sudo ./b2 install
 ```
 See the [Boost build docs](https://www.boost.org/doc/libs/1_75_0/more/getting_started/unix-variants.html#easy-build-and-install) if you want to change the installation locations etc.
+
 **Note: the Boost build may take tens of minutes. ***
    
 ## Build
