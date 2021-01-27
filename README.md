@@ -16,6 +16,7 @@ sudo apt install libssl-dev
 sudo apt install zlib1g-dev
 ```
 3. [Boost](https://www.boost.org/doc/libs/1_75_0/)
+
 In the directory you want to install Boost do:
 ```bash
 wget https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2
