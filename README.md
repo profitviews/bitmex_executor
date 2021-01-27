@@ -33,3 +33,7 @@ To build `bitmex_executor` you must install the following packages:
 1. Other software
    `sudo apt install libssl-dev`
    `sudo apt install zlib1g-dev`
+   
+## Build
+
+1. `git clone 
