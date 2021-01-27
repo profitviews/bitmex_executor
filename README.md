@@ -32,14 +32,3 @@ To build `bitmex_executor` you must install the following packages:
 1. Other software
    `sudo apt install libssl-dev`
    `sudo apt install zlib1g-dev`
-
-1. Poco
-
-   ```shell
-   git clone -b master https://github.com/pocoproject/poco.git`
-   cd poco
-   make
-   sudo make install
-   ```   
- 
-   
