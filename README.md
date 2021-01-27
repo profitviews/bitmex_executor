@@ -36,4 +36,14 @@ To build `bitmex_executor` you must install the following packages:
    
 ## Build
 
-1. `git clone 
+```
+git clone https://github.com/profitviews/bitmex_executor.git
+cd bitmex_executor/build
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+cmake --build .
+```
+
+This will create (with debug symbols)
+* `build/bitmex_executer` which will run the code of `execute_bitmex_order.cpp`
+* `build/libbitmex_trade.a` a static library containing classes to be used to execute market orders on BitMEX
+ 
