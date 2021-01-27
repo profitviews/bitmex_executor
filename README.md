@@ -6,25 +6,21 @@ The below describes how th build this library from scratch.  Any difficulties in
 
 ## Prerequisites
 
-You will need a modern C++ compiler.  I built with `10.2.0-13ubuntu1` with the C++ 20 compiler option.
+Install the compilers: 
+sudo apt install build-essential
+Other software packages: 
+sudo apt install libssl-dev 
+sudo apt install zlib1g-dev
+Boost
+In the directory you want to install Boost do:
+wget https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2
+tar xf boost_1_75_0.tar.bz2
+cd boost_1_75_0
+./bootstrap.sh
+sudo ./b2 install
+See the Boost build docs if you want to change the installation locations etc.
+Note: the Boost build may take tens of minutes. 
 
-To build `bitmex_executor` you must install the following packages:
-* `libssl-dev`
-* `zlib1g-dev`
-* [Boost](https://www.boost.org/doc/libs/1_75_0/)
-
-## Windows
-
-1. Msys
-   To build on Windows you need [Msys2](https://www.msys2.org/).  Follow the instructions there.
-
-2. Msys will give you `pacman` package manager, `g++` and other essential programs.
-   Use `pacman` to get:
-   
-   * `cmake`
-   * `mingw-w64-x86_64-boost`
-   * `mingw-w64-x86_64-poco`
-   
 ## Linux
 
 1. Compilers
