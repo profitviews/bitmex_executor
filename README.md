@@ -6,29 +6,26 @@ The below describes how th build this library from scratch.  Any difficulties in
 
 ## Prerequisites
 
-Install the compilers: 
+1. Install the compilers: 
+```bash
 sudo apt install build-essential
-Other software packages: 
+```
+2. Other software packages: 
+```bash
 sudo apt install libssl-dev 
 sudo apt install zlib1g-dev
-Boost
+```
+3. [Boost](https://www.boost.org/doc/libs/1_75_0/)
 In the directory you want to install Boost do:
+```bash
 wget https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2
 tar xf boost_1_75_0.tar.bz2
 cd boost_1_75_0
 ./bootstrap.sh
 sudo ./b2 install
-See the Boost build docs if you want to change the installation locations etc.
-Note: the Boost build may take tens of minutes. 
-
-## Linux
-
-1. Compilers
-   `sudo apt install build-essential`
-   
-1. Other software
-   `sudo apt install libssl-dev`
-   `sudo apt install zlib1g-dev`
+```
+See the [Boost build docs](https://www.boost.org/doc/libs/1_75_0/more/getting_started/unix-variants.html#easy-build-and-install) if you want to change the installation locations etc.
+**Note: the Boost build may take tens of minutes. ***
    
 ## Build
 
