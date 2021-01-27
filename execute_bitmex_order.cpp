@@ -20,10 +20,9 @@ auto main(int argc, char** argv) -> int
 
     Bitmex bitmex(argv[1], argv[2]);
 
-    BOOST_LOG_TRIVIAL(info) << "XBTUSD 1 result: " << bitmex.new_order("XBTUSD", Side::sell, 1, OrderType::market) << std::endl;
-    BOOST_LOG_TRIVIAL(info) << "XBTUSD 2 result: " << bitmex.new_order("XBTUSD", Side::sell, 1, OrderType::market) << std::endl;
+    BOOST_LOG_TRIVIAL(info) << "XBTUSD 1 result: " << bitmex.new_order("XBTUSD", Side::sell, 20, OrderType::market) << std::endl;
     BOOST_LOG_TRIVIAL(info) << "ETHUSD result: " << bitmex.new_order("ETHUSD", Side::buy,  1, OrderType::market) << std::endl;
-    BOOST_LOG_TRIVIAL(info) << "XRPUSD result: " << bitmex.new_order("XRPUSD", Side::sell, 1, OrderType::market) << std::endl;
+    BOOST_LOG_TRIVIAL(info) << "XRPUSD result: " << bitmex.new_order("XRPUSD", Side::sell, 10, OrderType::market) << std::endl;
 
     return 0;
 }
