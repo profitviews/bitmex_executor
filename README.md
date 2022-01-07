@@ -14,18 +14,19 @@ sudo apt install build-essential
 ```bash
 sudo apt install libssl-dev 
 sudo apt install zlib1g-dev
+sudo snap install --classic cmake
 ```
-3. [Boost](https://www.boost.org/doc/libs/1_75_0/)
+3. [Boost](https://www.boost.org/doc/libs/1_78_0/)
 
 In the directory you want to install Boost do:
 ```bash
-wget https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2
-tar xf boost_1_75_0.tar.bz2
-cd boost_1_75_0
+wget https://boostorg.jfrog.io/artifactory/main/release/1.78.0/source/boost_1_78_0.tar.bz2
+tar xf boost_1_78_0.tar.bz2
+cd boost_1_78_0
 ./bootstrap.sh
 sudo ./b2 install
 ```
-See the [Boost build docs](https://www.boost.org/doc/libs/1_75_0/more/getting_started/unix-variants.html#easy-build-and-install) if you want to change the installation locations etc.
+See the [Boost build docs](https://www.boost.org/doc/libs/1_78_0/more/getting_started/unix-variants.html#easy-build-and-install) if you want to change the installation locations etc.
 
 **Note: the Boost build may take tens of minutes**
    
